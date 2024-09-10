@@ -1,0 +1,21 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "blockchain_d"
+version = "0.1"
+description = "Create immutable copies using blockchain for ransomware protection"
+dependencies = ["argpi", "colorama", "looger"]
+
+[tool.maturin]
+python-source = "pysrc"
+module-name = "blockchain_d.rust"
+
+[project.scripts]
+# detectf = "detecteff:core.run"
+daemon = "blockchain_d:driver.main"
+daemon-launch = "blockchain_d:launcher.main"
+
+[project.urls]
+GitHub = "https://github.com/d33pster/shadowcopy-bc"
