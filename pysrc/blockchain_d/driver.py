@@ -6,7 +6,7 @@ from os import system as run, makedirs, getcwd
 from os.path import join, expanduser
 from platform import system as os_
 from colorama import init as colorize, Fore as _
-import sys, pickle, socket, warnings
+import sys, pickle, socket
 
 class Driver:
     def __init__(self):
@@ -225,3 +225,5 @@ class Driver:
 def main():
     driver = Driver()
     driver.start()
+
+main()
