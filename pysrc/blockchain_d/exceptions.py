@@ -13,6 +13,12 @@ class PortNumberNotProvided(Warning):
 # exception: OS not supported Yet
 class OperatingSystemNotSupported(Exception):
     pass
+# exception: FTP Host not provided.
+class FTPHostErr(Exception):
+    pass
+# exception: FTP login not given
+class FTPLoginErr(Exception):
+    pass
 
 # daemon.py
 # exception: if process_id is not found in the logs

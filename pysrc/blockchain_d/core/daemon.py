@@ -66,6 +66,7 @@ class Daemon:
                 #  'add' will have these: location (str), encryption (bool-str), password: (str-None)
                 #  'fetch' will have these: to (str), filename (str), password (str-None)
                 #  'backup' will have these: location (str)
+                #  'send-ftp' will have these: host, login, filename, password
                 # }
 
                 try:
@@ -109,6 +110,20 @@ class Daemon:
                         logger.debug(f"Available Backups: {sort_and_return_backups(self.config, "bcDaemon_", "_", 1)}", False)
                     elif request["type"] == "list":
                         logger.debug(f"{blockchain.generator.list()}", False)
+                    elif request["type"] == "send-ftp":
+                        if request["password"].lower() == "none":
+                            password = None
+                        else:
+                            password = request["password"].encode('ascii')
+                        
+                        host = request['host']
+                        login = request['login']
+                        filename = request['filename']
+
+                        if blockchain.send_ftp(filename, host, login, password):
+                            logger.debug(f"sent {filename} to {host}.", False)
+                        else:
+                            logger.debug(f"Failed to send {filename} to {host}")
                 except Exception as e:
                     logger.err(f"Exception Occured: {e}.", False)
 

@@ -2,7 +2,7 @@
 from ..rust import BlockChainGenerator
 from ..exceptions import PasswordNotFound
 from os.path import join as joinPath, expanduser, basename, expandvars
-from os import makedirs, unlink, listdir, getcwd
+from os import makedirs, unlink, listdir, getcwd, system
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -13,6 +13,8 @@ from base64 import urlsafe_b64encode as b_encode
 from tkinter.messagebox import askokcancel
 from ..utils.logger import Log
 import tkinter as tk
+import ftplib
+import io
 
 # setup logger
 logger = Log().logger
@@ -153,6 +155,73 @@ class BlockChain:
                     return False
         else:
             return True
+    
+    def send_ftp(self, filename: str, host: str, login: str, password: bytes | None) -> bool:
+        # write the contents from the block chain to the file.
+        # print(filename, to)
+        logger.info(f"Trying to find {filename} on blockchain", False)
+        data = self.generator.iterate_and_find(filename)
+    
+        # parse login
+        username = login.split('@')[0].strip()
+        passd = login.split('@')[-1].split(':')[0].strip()
+        port = login.split('@')[-1].split(":")[-1].strip()
+        
+        # the contents needs to be read again and decrypted.
+        if password != None:
+            __kdf = PBKDF2HMAC(
+                algorithm=SHA256(),
+                length=32,
+                salt="BlockChain Generator personal salt. mmmmm its so salty. wish it was a bit sweet too".encode("ascii"),
+                iterations=500000,
+            )
+
+            __fernet = Fernet(b_encode(__kdf.derive(password)))
+
+            try:
+                # try to decrypt with the given key
+                contents = __fernet.decrypt(data)
+
+                try:
+                    ftp = ftplib.FTP()
+                    logger.info(ftp.connect(host, int(port)), False)
+                    logger.info(ftp.login(username, passd), False)
+                    with io.BytesIO(contents) as ref:
+                        logger.info(ftp.storbinary(f"STOR {filename}", ref), False)
+                    logger.debug(ftp.retrlines("LIST"), False)
+                    logger.info(ftp.quit(), False)
+                    return True
+                except Exception as e:
+                    logger.info(e, False)
+                    return False
+            except (InvalidToken, InvalidSignature):
+                logger.err("Failed to decrypt File. Returing encrypted.", False)
+                try:
+                    ftp = ftplib.FTP()
+                    logger.info(ftp.connect(host, int(port)), False)
+                    logger.info(ftp.login(username, passd), False)
+                    with io.BytesIO(data) as ref:
+                        logger.info(ftp.storbinary(f"STOR {filename}", ref), False)
+                    logger.debug(ftp.retrlines("LIST"), False)
+                    logger.info(ftp.quit(), False)
+                    return True
+                except Exception as e:
+                    logger.info(e, False)
+                    return False
+        else:
+            try:
+                ftp = ftplib.FTP()
+                logger.info(ftp.connect(host, int(port)), False)
+                logger.info(ftp.login(username, passd), False)
+                with io.BytesIO(data) as ref:
+                    logger.info(ftp.storbinary(f"STOR {filename}", ref), False)
+                logger.debug(ftp.retrlines("LIST"), False)
+                logger.info(ftp.quit(), False)
+                return True
+            except Exception as e:
+                logger.info(e, False)
+                return False
+
         
     @property
     def is_valid(self) -> bool:
