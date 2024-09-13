@@ -10,7 +10,7 @@ use chrono::prelude::*;
 // use chrono::{Datelike, Timelike, Local, NaiveDateTime};
 // use std::{fmt, time};
 use pyo3::prelude::*;
-// use pyo3::types::PyBytes;
+use pyo3::types::PyBytes;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct Block {
@@ -187,6 +187,33 @@ impl BlockChainGenerator {
             Ok(())
         } else {
             Err(pyo3::exceptions::PyFileNotFoundError::new_err(format!("No file found: {}", filename_or_index)))
+        }
+    }
+
+    pub fn iterate_and_find(&self, filename: String, py: Python, ) -> Py<PyBytes> {
+        let mut data: Vec<u8> = Vec::new();
+        for chain in &self.blockchain.chain {
+            if chain.filename == filename {
+                data = chain.data.get().clone();
+                break;
+            } else if chain.index.to_string() == filename {
+                data = chain.data.get().clone();
+                break;
+            }
+        }
+
+        if data.is_empty() {
+            // Err(pyo3::exceptions::PyFileNotFoundError::new_err(format!("No file found: {}", filename)
+            std::process::exit(1);
+        } else {
+            // let data_ptr = data.as_ptr();
+            let data_len = data.len();
+            let pybytes = PyBytes::new_bound_with(py, data_len, |buffer| {
+                buffer.copy_from_slice(&data);
+                Ok(())
+            }).unwrap();
+
+            Py::from(pybytes)
         }
     }
 
