@@ -127,6 +127,27 @@ class Arguments:
                 .shorthand("-b")
         )
 
+        # export to ftp
+        self.arguments.__add__(
+            "--to-ftp",
+            ArgumentDescription()
+                .name("ftp")
+                .description("export to ftp server")
+                .shorthand("-ftp")
+        )
+
+        # FTP host
+        self.arguments.__add__(
+            "--host",
+            ArgumentDescription().shorthand("-host")
+        )
+
+        # FTP user info -> username@password:port
+        self.arguments.__add__(
+            "--login",
+            ArgumentDescription().shorthand('-login')
+        )
+
         self.arguments.__analyse__()
     
     @property

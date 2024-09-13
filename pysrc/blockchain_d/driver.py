@@ -1,6 +1,6 @@
 from .core.daemon import Daemon, stop as stop_daemon, get_port_number_from_logs
 from .utils.arguments import Arguments
-from .exceptions import OperatingSystemNotSupported, PasswordNotFound, PortNumberNotProvided
+from .exceptions import OperatingSystemNotSupported, PasswordNotFound, PortNumberNotProvided, FTPHostErr, FTPLoginErr
 
 from os import system as run, makedirs, getcwd
 from os.path import join, expanduser
@@ -180,6 +180,41 @@ class Driver:
             headers = pickle.dumps(headers)
 
             # send it to daemon
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
+                client.connect(('localhost', get_port_number_from_logs()))
+                client.sendall(headers)
+        elif self.arguments.__there__("--to-ftp"):
+            # get filename from the argument itself
+            filename: str = self.arguments.__fetch__("--to-ftp", self.fetchtype.SINGULAR)
+
+            # check host
+            if not self.arguments.__there__("--host"):
+                raise FTPHostErr("Host is required to export to FTP")
+            else:
+                host: str = self.arguments.__fetch__("--host", self.fetchtype.SINGULAR)
+            
+            # check login
+            if not self.arguments.__there__("--login"):
+                raise FTPLoginErr("Login info is not provided. Format: username@password:port")
+            else:
+                login: str = self.arguments.__fetch__("--login", self.fetchtype.SINGULAR)
+            
+            # check password
+            if not self.arguments.__there__("--password"):
+                password = "none"
+            else:
+                password: str = self.arguments.__fetch__("--password", self.fetchtype.SINGULAR)
+            
+            headers = {
+                "type": "send-ftp",
+                "host": host,
+                "login": login,
+                "password": password,
+                "filename": filename
+            }
+
+            headers = pickle.dumps(headers)
+
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
                 client.connect(('localhost', get_port_number_from_logs()))
                 client.sendall(headers)
