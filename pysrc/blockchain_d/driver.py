@@ -225,5 +225,3 @@ class Driver:
 def main():
     driver = Driver()
     driver.start()
-
-main()
