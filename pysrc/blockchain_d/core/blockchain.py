@@ -1,6 +1,7 @@
 
 from ..rust import BlockChainGenerator
 from ..exceptions import PasswordNotFound
+from ..utils.ftp import FTP
 from os.path import join as joinPath, expanduser, basename, expandvars
 from os import makedirs, unlink, listdir, getcwd, system
 
@@ -183,26 +184,34 @@ class BlockChain:
                 contents = __fernet.decrypt(data)
 
                 try:
-                    ftp = ftplib.FTP()
+                    ftp = FTP()
                     logger.info(ftp.connect(host, int(port)), False)
                     logger.info(ftp.login(username, passd), False)
                     with io.BytesIO(contents) as ref:
                         logger.info(ftp.storbinary(f"STOR {filename}", ref), False)
-                    logger.debug(ftp.retrlines("LIST"), False)
+                    lines, code = ftp.retrlines("LIST")
+                    logger.debug(f"Write to ftp status code: {code}", False)
+                    logger.debug(f"Fetched result from ftp server {host}:", False)
+                    for line in lines:
+                        logger.debug(line, False)
                     logger.info(ftp.quit(), False)
                     return True
                 except Exception as e:
-                    logger.info(e, False)
+                    logger.info(str(e), False)
                     return False
             except (InvalidToken, InvalidSignature):
                 logger.err("Failed to decrypt File. Returing encrypted.", False)
                 try:
-                    ftp = ftplib.FTP()
+                    ftp = FTP()
                     logger.info(ftp.connect(host, int(port)), False)
                     logger.info(ftp.login(username, passd), False)
                     with io.BytesIO(data) as ref:
                         logger.info(ftp.storbinary(f"STOR {filename}", ref), False)
-                    logger.debug(ftp.retrlines("LIST"), False)
+                    lines, code = ftp.retrlines("LIST")
+                    logger.debug(f"Write to ftp status code: {code}", False)
+                    logger.debug(f"Fetched result from ftp server {host}:", False)
+                    for line in lines:
+                        logger.debug(line, False)
                     logger.info(ftp.quit(), False)
                     return True
                 except Exception as e:
@@ -210,12 +219,16 @@ class BlockChain:
                     return False
         else:
             try:
-                ftp = ftplib.FTP()
+                ftp = FTP()
                 logger.info(ftp.connect(host, int(port)), False)
                 logger.info(ftp.login(username, passd), False)
                 with io.BytesIO(data) as ref:
                     logger.info(ftp.storbinary(f"STOR {filename}", ref), False)
-                logger.debug(ftp.retrlines("LIST"), False)
+                lines, code = ftp.retrlines("LIST", False)
+                logger.debug(f"Write to ftp status code: {code}", False)
+                logger.debug(f"Fetched result from ftp server {host}:", False)
+                for line in lines:
+                        logger.debug(line, False)
                 logger.info(ftp.quit(), False)
                 return True
             except Exception as e:
