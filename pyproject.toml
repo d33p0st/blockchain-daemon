@@ -6,7 +6,7 @@ build-backend = "maturin"
 name = "blockchain_d"
 version = "0.1"
 description = "Create immutable copies using blockchain for ransomware protection"
-dependencies = ["argpi", "colorama", "looger"]
+dependencies = ["argpi", "colorama", "looger", 'tk', 'pyperclip']
 
 [tool.maturin]
 python-source = "pysrc"
