@@ -127,6 +127,12 @@ class Arguments:
                 .shorthand("-b")
         )
 
+        # force backup
+        self.arguments.__add__(
+            "--force-backup",
+            ArgumentDescription().shorthand("-fb")
+        )
+
         # export to ftp
         self.arguments.__add__(
             "--to-ftp",
@@ -146,6 +152,12 @@ class Arguments:
         self.arguments.__add__(
             "--login",
             ArgumentDescription().shorthand('-login')
+        )
+
+        # gui command
+        self.arguments.__add__(
+            "--gui",
+            ArgumentDescription().shorthand('-g')
         )
 
         self.arguments.__analyse__()
