@@ -109,7 +109,7 @@ class Daemon:
                         # get currently available backups as debug
                         logger.debug(f"Available Backups: {sort_and_return_backups(self.config, "bcDaemon_", "_", 1)}", False)
                     elif request["type"] == "list":
-                        logger.debug(f"{blockchain.generator.list()}", False)
+                        logger.debug(f"Files: {blockchain.generator.list()}", False)
                     elif request["type"] == "send-ftp":
                         if request["password"].lower() == "none":
                             password = None
@@ -129,7 +129,7 @@ class Daemon:
 
 
 # ---------------------------------- RESERVED -------------------------------
-def stop():
+def stop(backup: bool = True):
     # read the lines from log file
     with open(LOGFILE, 'r+') as log_ref:
         # get it in reverse order
@@ -146,7 +146,8 @@ def stop():
             break
     
     # create a backup before leaving - check if needed
-    run(f"daemon -b {join(expanduser('~'), '.bcd')}")
+    if backup:
+        run(f"daemon -b {join(expanduser('~'), '.bcd')}")
     
     if process_id == None:
         logger.err(f"Failed to get process ID from logs, Check the process ID from the logs@{LOGFILE} and kill it. Or restart the system to terminate.", False)

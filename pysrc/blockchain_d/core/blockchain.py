@@ -50,8 +50,9 @@ class BlockChain:
     
     def __exit__(self, exc_type, exc_value, traceback):
         # on exit, create a new backup
-        logger.info("Exit triggered, preparing backup", False)
-        self.generator.exit_protocol(self.config)
+        # logger.info("Exit triggered, preparing backup", False)
+        # self.generator.exit_protocol(self.config)
+        pass
 
     def add(self, file_loc: str, encryption: bool = False, password: bytes | None = None) -> None:
         """##### `Add a block into the blockchain.`
