@@ -1,4 +1,5 @@
 from .core.daemon import Daemon, stop as stop_daemon, get_port_number_from_logs
+from .core.gui import DaemonGUI
 from .utils.arguments import Arguments
 from .exceptions import OperatingSystemNotSupported, PasswordNotFound, PortNumberNotProvided, FTPHostErr, FTPLoginErr
 
@@ -100,8 +101,11 @@ class Driver:
                 raise OperatingSystemNotSupported("This os will be supported soon!")
         # then for stop
         elif self.arguments.__there__("--stop"):
+            if self.arguments.__there__("--force-backup"):
+                stop_daemon(False)
             # stop the daemon
-            stop_daemon()
+            else:
+                stop_daemon(False)
         # then for add command
         elif self.arguments.__there__('--add'):
             # get location from arguments
@@ -218,6 +222,11 @@ class Driver:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
                 client.connect(('localhost', get_port_number_from_logs()))
                 client.sendall(headers)
+        elif self.arguments.__there__('--gui'):
+            root = DaemonGUI.makeroot()
+            gui = DaemonGUI(root)
+            gui.make_initial_screen()
+            root.mainloop()
         else:
             print("daemon: argument error. check help.")
             sys.exit(1)
