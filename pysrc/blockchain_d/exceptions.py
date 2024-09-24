@@ -24,3 +24,8 @@ class FTPLoginErr(Exception):
 # exception: if process_id is not found in the logs
 class ProcessIDNotFound(Exception):
     pass
+
+# gui.py
+# exception: If start/stop button has some different text
+class ButtonErr(Exception):
+    pass
