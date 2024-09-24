@@ -6,14 +6,13 @@ build-backend = "maturin"
 name = "blockchain_d"
 version = "0.1"
 description = "Create immutable copies using blockchain for ransomware protection"
-dependencies = ["argpi", "colorama", "looger"]
+dependencies = ["argpi", "colorama", "looger", 'tk']
 
 [tool.maturin]
 python-source = "pysrc"
 module-name = "blockchain_d.rust"
 
 [project.scripts]
-# detectf = "detecteff:core.run"
 daemon = "blockchain_d:driver.main"
 daemon-launch = "blockchain_d:launcher.main"
 
